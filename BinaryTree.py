@@ -16,6 +16,7 @@ class Node:
         else:
             self.next_nodes = []
         self.data = data
+        self.coo = ()
 
     def get_data(self):
         return self.data
@@ -62,10 +63,10 @@ class BinomialTree(BinaryTree):
         self.print_coo = []
         self.sorted_coo = []
         self.create_tree()
-        self.get_plot_coo()
+        self.set_plot_coo()
         self.row_coo = []
         self.col_coo = []
-        self.y_coo_sorted= []
+        self.y_coo_sorted=[]
 
     def create_tree(self):
         print("create tree called")
@@ -88,7 +89,7 @@ class BinomialTree(BinaryTree):
     def get_tree_node(self, i, j):
         return self.tree[i][j]
 
-    def get_plot_coo(self):
+    def set_plot_coo(self):
         number_of_rows = self.depth * 2 - 1
         for i in range(number_of_rows):
             count = 0
@@ -103,8 +104,6 @@ class BinomialTree(BinaryTree):
                         count += 1
                 if x != 1:
                     x = " "
-                print(x, " ", end="")
-            print("")
 
     def set_up(self):
         self.row_coo = [coo[0] for coo in self.print_coo]
@@ -117,6 +116,8 @@ class BinomialTree(BinaryTree):
 
         sort_for_mesh = sorted(zip(temp_row_coo, self.y_coo_sorted))
         self.sorted_coo = sort_for_mesh
+        for node, coo in zip(self.flat_tree, self.sorted_coo):
+            node.coo = coo
 
     def plot_tree(self):
         self.set_up()
@@ -133,6 +134,16 @@ class BinomialTree(BinaryTree):
         self.sorted_coo = sort_for_plot
         for i, j in zip(sort_for_plot, self.flat_tree):
             plt.annotate(j.get_data(), (i[0] - .05, i[1] + .25))
+
+        for x in range(len(self.tree) - 1):
+            for y in range(x + 1):
+                alpha1 = binom(x, y) / 2**x
+                alpha2 = binom(x, y + 1) / 2**x
+                plt.plot([self.tree[x][y].coo[0], self.tree[x + 1][y].coo[0]],
+                         [self.tree[x][y].coo[1], self.tree[x + 1][y].coo[1]], "k-")
+                plt.plot([self.tree[x][y].coo[0], self.tree[x + 1][y + 1].coo[0]],
+                         [self.tree[x][y].coo[1], self.tree[x + 1][y + 1].coo[1]], "k-")
+
         plt.show()
 
     def print_tree(self):
@@ -144,20 +155,5 @@ class BinomialTree(BinaryTree):
         mesh = mesh.T
         print(mesh)
 
-    """
-        for m in range(self.depth):
-            binomial_struc = [int(binom(m, i)) for i in range(m + 1)]
-            # counter = 0
-            if m > 0:
-                
-                for k in range(len_all_nodes[m]):
-                    print(f"m:, {m}, k: , {k}, binomial struc: {binomial_struc}, check: {np.sum(binomial_struc)}")
-                    temp_sum = binomial_struc[0]
-        """
 
 
-a = BinomialTree()
-b = a.get_tree_node(1, 0)
-print(b.get_next_nodes())
-a.plot_tree()
-a.print_tree()
